@@ -8,14 +8,15 @@ const themDestination = new Vector(0, 600);
 const lerp = {
 	flockGoal: 0.5,
 	com: 0.01,
-	repel: 0.5
+	repelTeam: 0.5,
+	repelEnemy: 1
 }
 
 const personalSpace = 100;
 const repulsionThreshold = 100;
 const repulsionConstant = -100000000;
 
-const actorSize = 20;
+const actorSize = 10;
 const actorMaxSpeed = 10;
 
 const meColor = "blue";
@@ -32,30 +33,41 @@ class Actor {
 	}
 
 	CalcVelocity(team, enemies) {
-		// Attraction to enter of mass of flock
+		// Attraction to enter of mass of flock and repulsion from close teammates
 		let com = new Vector(0, 0);
+		let repulsionTeam = new Vector(0, 0);
+		let repulsionCountTeam = 0;
 
 		for (const teammate of team) {
-			if (Vector.dist(teammate.position, this.position) > personalSpace) {
-				com.add(Vector.subtract(teammate.position, this.position));
+			com.add(Vector.subtract(teammate.position, this.position));
+			if (Vector.dist(teammate.position, this.position) <= repulsionThreshold) {
+				repulsionCountTeam++;
+				const direction = Vector.subtract(teammate.position, this.position);
+				const distance = direction.mag();
+				if (distance === 0) {
+					continue;
+				}
+				direction.unit();
+				repulsionTeam.add(direction.mult((repulsionConstant) / distance ** 4));
 			}
 		}
 		com.mult(1 / team.length);
+		repulsionTeam.mult(1 / Math.max(1, repulsionCountTeam));
 
 		// Repulsion from enemies
-		let repulsion = new Vector(0, 0);
-		let repulsionCount = 0;
+		let repulsionEnemy = new Vector(0, 0);
+		let repulsionCountEnemy = 0;
 
 		for (const enemy of enemies) {
 			if (Vector.dist(enemy.position, this.position) <= repulsionThreshold) {
-				repulsionCount++;
+				repulsionCountEnemy++;
 				const direction = Vector.subtract(enemy.position, this.position);
 				const distance = direction.mag();
 				direction.unit();
-				repulsion.add(direction.mult(repulsionConstant / distance ** 4));
+				repulsionEnemy.add(direction.mult(repulsionConstant / distance ** 4));
 			}
 		}
-		repulsion.mult(1 / Math.max(1, repulsionCount));
+		repulsionEnemy.mult(1 / Math.max(1, repulsionCountEnemy));
 
 		// Go to flock goal
 		let flockGoalDrive = Vector.subtract(this.destination, this.position).unit().mult(this.maxSpeed);
@@ -63,10 +75,10 @@ class Actor {
 		// Do the lerp
 		this.velocity = Vector.add(
 			com.mult(lerp.com),
-			repulsion.mult(lerp.repel),
+			repulsionTeam.mult(lerp.repelTeam),
+			repulsionEnemy.mult(lerp.repelEnemy),
 			flockGoalDrive.mult(lerp.flockGoal)
 		).unit().mult(this.maxSpeed);
-
 	}
 
 	Update(deltaTime, team, enemies) {
@@ -100,7 +112,7 @@ function main(curTime) {
 		prevTime = curTime;
 	}
 
-	const deltaTime = (curTime - prevTime) / 16000;
+	const deltaTime = (curTime - prevTime) / 160;
 
 	for (const meGuy of meGuys) {
 		meGuy.Update(deltaTime, meGuys, themGuys);
@@ -116,6 +128,7 @@ function main(curTime) {
 	for (const themGuy of themGuys) {
 		themGuy.Render();
 	}
+	prevTime = curTime;
 	requestAnimationFrame(main);
 }
 
