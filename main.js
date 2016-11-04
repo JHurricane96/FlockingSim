@@ -12,7 +12,7 @@ const lerp = {
 }
 
 const personalSpace = 100;
-const repulsionThreshold = 10000;
+const repulsionThreshold = 100;
 const repulsionConstant = -100000000;
 
 const actorSize = 20;
