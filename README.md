@@ -16,3 +16,4 @@ Simulator for flocking and steering behaviour.
 * Each unit in a flock flocks with other units in the same flock.
 * Units in a flock have a common destination.
 * Units from opposite flocks avoid each other.
+* Units from the same flock avoid each other a little lesser.
