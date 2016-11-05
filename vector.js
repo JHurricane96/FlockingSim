@@ -76,6 +76,44 @@ Vector.dist = function (v1, v2) {
 	return Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2));
 }
 
+//Angle between two vectors
+
+Vector.angle = function (v1, v2) {
+	if (!(v1 instanceof Vector) || !(v2 instanceof Vector))
+		throw new Error("Bad parameter(s)");
+	unit1 = Vector.unit(v1);
+	unit2 = Vector.unit(v2);
+	return Math.acos(unit1.x * unit2.x + unit1.y * unit2.y);
+}
+
+// Dot product of two vectors
+
+Vector.dot = function (v1, v2) {
+	if (!(v1 instanceof Vector) || !(v2 instanceof Vector))
+		throw new Error("Bad parameter(s)");
+	return v1.x * v2.x + v1.y * v2.y;
+}
+
+// Rotate a vector by the given angle
+
+Vector.rotate = function (vector, angle) {
+	if (!(vector instanceof Vector))
+		throw new Error("Bad parameter(s)");
+	let cos = Math.cos(angle);
+	let sin = Math.sin(angle);
+	let xNew = vector.x * cos - vector.y * sin;
+	let yNew = vector.x * sin + vector.y * cos;
+	return new Vector(xNew, yNew);
+}
+
+// Signed magnitude of cross product of two vectors
+
+Vector.cross = function (v1, v2) {
+	if (!(v1 instanceof Vector) || !(v2 instanceof Vector))
+		throw new Error("Bad parameter(s)");
+	return v1.x * v2.y - v1.y * v2.x;
+}
+
 //OO versions of above functions follow
 
 //Adds one vector to this
@@ -113,4 +151,14 @@ Vector.prototype.mult = function (scalar) {
 
 Vector.prototype.mag = function () {
 	return Math.sqrt((this.x * this.x) + (this.y * this.y));
+}
+
+Vector.prototype.rotate = function (angle) {
+	let cos = Math.cos(angle);
+	let sin = Math.sin(angle);
+	let xNew = this.x * cos - this.y * sin;
+	let yNew = this.y * cos + this.x * sin;
+	this.x = xNew;
+	this.y = yNew;
+	return this;
 }
