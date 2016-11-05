@@ -2,7 +2,7 @@ const context = document.getElementById("canvas").getContext("2d");
 const canvasWidth = 1300;
 const canvasHeight = 600;
 
-const mapScale = 0.1;
+const mapScale = 1;
 
 const meGuys = [];
 const themGuys = [];
@@ -16,7 +16,7 @@ const lerp = {
 
 const repulsionThresholdTeam = 50 * mapScale;
 const repulsionThresholdEnemy = 50 * mapScale;
-const repulsionConstant = -(10 ** 7) * mapScale;
+const repulsionConstant = -(10 ** 6) * (mapScale ** 4);
 
 const interUnitDist = 5 * mapScale;
 
@@ -148,7 +148,7 @@ class Actor {
 	}
 
 	Update(deltaTime, team, enemies, i) {
-		this.CalcVelocity(team, enemies, i);
+		// this.CalcVelocity(team, enemies, i);
 		const newPosition = Vector.add(this.position, Vector.mult(this.velocity, deltaTime));
 		let isColliding = false;
 		for (const enemy of enemies) {
@@ -192,46 +192,42 @@ function main(curTime) {
 	let noOfThemFormed = 0;
 
 	meGuys.forEach((meGuy, i) => {
-		meGuy.Update(deltaTime, meGuys, themGuys, i);
+		meGuy.CalcVelocity(meGuys, themGuys, i);
 		if (meGuy.isInFormation === false) {
-			meGuy.Update(deltaTime, meGuys, themGuys, i);
+			meGuy.velocity.mult(2);
 		} else {
 			noOfMeFormed++;
 		}
+	});
+
+	meGuys.forEach((meGuy, i) => {
+		if (noOfMeFormed === meGuys.length) {
+			meGuy.velocity.mult(2);
+		}
+		meGuy.Update(deltaTime, meGuys, themGuys, i);
 		if (meGuy.isDead === true) {
 			deadMeGuys.push(i);
 		}
 	});
 
-	if (noOfMeFormed === meGuys.length) {
-		meGuys.forEach((meGuy, i) => {
-			meGuy.Update(deltaTime, meGuys, themGuys, i);
-			if (meGuy.isDead === true) {
-				deadMeGuys.push(i);
-			}
-		});
-	}
-
 	themGuys.forEach((themGuy, i) => {
-		themGuy.Update(deltaTime, themGuys, meGuys, i);
+		themGuy.CalcVelocity(themGuys, meGuys, i);
 		if (themGuy.isInFormation === false) {
-			themGuy.Update(deltaTime, themGuys, meGuys, i);
+			themGuy.velocity.mult(2);
 		} else {
 			noOfThemFormed++;
 		}
+	});
+
+	themGuys.forEach((themGuy, i) => {
+		if (noOfThemFormed === themGuys.length) {
+			themGuy.velocity.mult(2);
+		}
+		themGuy.Update(deltaTime, themGuys, meGuys, i);
 		if (themGuy.isDead === true) {
 			deadThemGuys.push(i);
 		}
 	});
-
-	if (noOfThemFormed === themGuys.length) {
-		themGuys.forEach((themGuy, i) => {
-			themGuy.Update(deltaTime, themGuys, meGuys, i);
-			if (themGuy.isDead === true) {
-				deadThemGuys.push(i);
-			}
-		})
-	}
 
 	for (const deadMeGuy of deadMeGuys) {
 		meGuys.splice(deadMeGuy, 1);
