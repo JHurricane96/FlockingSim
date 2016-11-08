@@ -1,6 +1,7 @@
-const context = document.getElementById("canvas").getContext("2d");
-const canvasWidth = 1364;
-const canvasHeight = 766;
+const canvas = document.getElementById("canvas")
+const context = canvas.getContext("2d");
+let canvasWidth = 0;
+let canvasHeight = 0;
 
 const mapScale = 0.15;
 
@@ -19,7 +20,7 @@ const lerp = {
 
 const repulsionThresholdTeam = 50 * mapScale;
 const repulsionThresholdEnemy = 50 * mapScale;
-const repulsionConstant = -(10 ** 6) * (mapScale ** 4);
+const repulsionConstant = -(11 ** 6) * (mapScale ** 4);
 
 const interUnitDist = 20 * mapScale;
 const deviationThreshold = 10 * mapScale;
@@ -32,10 +33,8 @@ const themMaxSpeed = 10;
 const meColor = "blue";
 const themColor = "red";
 
-const meDestination = new Vector(canvasWidth + actorSize, canvasHeight / 2);
-const themDestination = new Vector(canvasWidth / 2, canvasHeight + actorSize);
-// const meDestination = new Vector(canvasWidth + actorSize, - actorSize);
-// const themDestination = new Vector(-actorSize, canvasHeight + actorSize);
+let meDestination = new Vector(canvasWidth + actorSize, - actorSize);
+let themDestination = new Vector(-actorSize, canvasHeight + actorSize);
 
 const noOfMesSpawned = 10;
 const noOfThemsSpawned = 10;
@@ -311,5 +310,24 @@ window.addEventListener("mousedown", event => {
 	}
 });
 
+const ResizeCanvas = (() => {
+	let canResize = true;
+	return () => {
+		if (canResize === true) {
+			canvas.width = canvasWidth = window.innerWidth;
+			canvas.height = canvasHeight = window.innerHeight;
+			meDestination = new Vector(canvasWidth + actorSize, - actorSize);
+			themDestination = new Vector(-actorSize, canvasHeight + actorSize);
+			canResize = false;
+			setTimeout(() => {
+				canResize = true;
+			}, 1000 / 60);
+		}
+	}
+})()
+
+window.addEventListener("resize", ResizeCanvas);
+
+ResizeCanvas();
 requestAnimationFrame(main);
 window.oncontextmenu = () => false;
