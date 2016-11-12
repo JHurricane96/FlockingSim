@@ -14,7 +14,7 @@ const sortedThemGuys = [];
 const lerp = {
 	flockGoal: 1,
 	com: 0,
-	repelTeam: 0.07,
+	repelTeam: 0.1,
 	repelEnemy: 1
 }
 
@@ -23,12 +23,12 @@ const repulsionThresholdEnemy = 50 * mapScale;
 const repulsionConstant = -(12 ** 6) * (mapScale ** 4);
 
 const interUnitDist = 20 * mapScale;
-const deviationThreshold = 10 * mapScale;
+const deviationThreshold = 5 * mapScale;
 const noOfEnemiesToBreakFormation = 2;
 
 const actorSize = 10 * mapScale;
-const meMaxSpeed = 10;
-const themMaxSpeed = 10;
+const meMaxSpeed = 6;
+const themMaxSpeed = 6;
 
 const meColor = "blue";
 const themColor = "red";
@@ -37,8 +37,8 @@ let meDestination = new Vector(0, 0);
 let themDestination = new Vector(0, 0);
 
 function SetDestinations() {
-	meDestination = new Vector(canvasWidth + actorSize, canvasHeight / 2);
-	themDestination = new Vector(canvasWidth / 2, canvasHeight + actorSize);
+	meDestination = new Vector(canvasWidth + actorSize, -actorSize);
+	themDestination = new Vector(-actorSize, canvasHeight + actorSize);
 }
 
 const noOfMesSpawned = 10;
@@ -255,10 +255,12 @@ function main(curTime) {
 
 	if (deadMeGuys.length > 0) {
 		meGuys.splice(0, meGuys.length);
+		sortedMeGuys.splice(0, sortedMeGuys.length);
 	}
 
 	if (deadThemGuys.length > 0) {
 		themGuys.splice(0, themGuys.length);
+		sortedThemGuys.splice(0, sortedThemGuys.length);
 	}
 
 	if (meGuys.length >= 1 && meHasLeader === false) {
