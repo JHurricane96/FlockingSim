@@ -14,13 +14,13 @@ const sortedThemGuys = [];
 const lerp = {
 	flockGoal: 1,
 	com: 0,
-	repelTeam: 0.1,
+	repelTeam: 0.07,
 	repelEnemy: 1
 }
 
 const repulsionThresholdTeam = 50 * mapScale;
 const repulsionThresholdEnemy = 50 * mapScale;
-const repulsionConstant = -(11 ** 6) * (mapScale ** 4);
+const repulsionConstant = -(12 ** 6) * (mapScale ** 4);
 
 const interUnitDist = 20 * mapScale;
 const deviationThreshold = 10 * mapScale;
@@ -33,8 +33,13 @@ const themMaxSpeed = 10;
 const meColor = "blue";
 const themColor = "red";
 
-let meDestination = new Vector(canvasWidth + actorSize, - actorSize);
-let themDestination = new Vector(-actorSize, canvasHeight + actorSize);
+let meDestination = new Vector(0, 0);
+let themDestination = new Vector(0, 0);
+
+function SetDestinations() {
+	meDestination = new Vector(canvasWidth + actorSize, canvasHeight / 2);
+	themDestination = new Vector(canvasWidth / 2, canvasHeight + actorSize);
+}
 
 const noOfMesSpawned = 10;
 const noOfThemsSpawned = 10;
@@ -316,8 +321,7 @@ const ResizeCanvas = (() => {
 		if (canResize === true) {
 			canvas.width = canvasWidth = window.innerWidth;
 			canvas.height = canvasHeight = window.innerHeight;
-			meDestination = new Vector(canvasWidth + actorSize, - actorSize);
-			themDestination = new Vector(-actorSize, canvasHeight + actorSize);
+			SetDestinations();
 			canResize = false;
 			setTimeout(() => {
 				canResize = true;
