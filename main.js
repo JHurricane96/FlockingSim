@@ -3,45 +3,71 @@ const context = canvas.getContext("2d");
 let canvasWidth = 0;
 let canvasHeight = 0;
 
+// The scale of the map
 const mapScale = 0.15;
 
+// List of actors
 const meGuys = [];
 const themGuys = [];
 
+// List of actors sorted by x co-ordinate
 const sortedMeGuys = [];
 const sortedThemGuys = [];
 
+// Amount that each factor contributes to unit's velocity
 const lerp = {
+	// Either the final destination or relative position, depending on various factors
 	flockGoal: 1,
+	// Center of mass of formation. No longer used
 	com: 0,
+	// Repulsion between teammates
 	repelTeam: 0.1,
+	// Repulsion between a unit and its enemies
 	repelEnemy: 1
 }
 
+// Minimum distance that teammates must be from each other to start repelling
 const repulsionThresholdTeam = 50 * mapScale;
+// Minimum distance that units must be from enemies to start repelling
 const repulsionThresholdEnemy = 50 * mapScale;
+// Constant used in quartic repulsion equation
 const repulsionConstant = -(12 ** 6) * (mapScale ** 4);
 
+// Distance between units in formation
 const interUnitDist = 20 * mapScale;
+// Maximum permitted deviation a unit can be from its relative position for 
+// a team to be considered in fomation
 const deviationThreshold = 5 * mapScale;
+// Number of enemies that must be near a unit for it to break formation
 const noOfEnemiesToBreakFormation = 2;
 
+// Size of actors in pixels
 const actorSize = 10 * mapScale;
+// Our maximum speed
 const meMaxSpeed = 6;
+// Their maximum speed
 const themMaxSpeed = 6;
 
+// Our units' color
 const meColor = "blue";
+// Their units' color
 const themColor = "red";
 
+// Our destination
 let meDestination = new Vector(0, 0);
+// Their destination
 let themDestination = new Vector(0, 0);
 
+// Function for setting destinations
+// Modify this function to set where units will go
 function SetDestinations() {
 	meDestination = new Vector(canvasWidth + actorSize, -actorSize);
 	themDestination = new Vector(-actorSize, canvasHeight + actorSize);
 }
 
+// Number of our units spawned on left click
 const noOfMesSpawned = 10;
+// Number of their units spawned on right click
 const noOfThemsSpawned = 10;
 
 class Actor {
